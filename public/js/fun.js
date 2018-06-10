@@ -20,9 +20,10 @@ var spikiness = 0;
 
 function makeAngle(offset) {
   var angle = [];
-  var radian;
+  var radianHorizontal;
+  var radianVertical;
   for (var i = 0; i <= sphereSize; i++) {
-    radianHorizontal = Math.PI * offset / anglesCount;
+    radianHorizontal = 2 * Math.PI * offset / anglesCount;
     radianVertical = Math.PI * i / sphereSize - Math.PI / 2;
 
     angle.push(
@@ -36,16 +37,30 @@ function makeAngle(offset) {
   return angle;
 }
 
+var faces = [];
+var vertices = [];
+var angles = [];
+for (var i = 0; i < anglesCount; i++) {
+  angles.push(makeAngle(i));
+}
+angles.push(angles[0]);
+
 function makePairSurface(faces, offset, leftLength, rightLength) {
   for (var i = 0; i < leftLength - 1; i++) {
     faces.push(
-      new THREE.Face3(offset + i+1, offset + i, offset + Math.min(rightLength, i + 1) + leftLength - 1)
+      new THREE.Face3(
+        offset + i+1,
+        offset + i,
+        offset + (leftLength-1) + Math.min(rightLength, i + 1)
+      )
     )
   }
-
   for (var i = 0; i < rightLength - 1; i++) {
     faces.push(
-      new THREE.Face3(offset + Math.min(leftLength - 1, i + 1), offset + leftLength + i, offset + leftLength + i + 1)
+      new THREE.Face3(
+        offset + Math.min(leftLength - 1, i+1),
+        offset + leftLength + i,
+        offset + leftLength + i+1)
     )
   }
 }
@@ -53,7 +68,7 @@ function makePairSurface(faces, offset, leftLength, rightLength) {
 function triangulate(faces, vertices, angles) {
   var left, right, leftLength, rightLength;
   var offset = 0;
-  for (var i = 0; i < angles.length - 1; i++) {
+  for (var i = 0; i < angles.length-1; i++) {
     left = angles[i];
     leftLength = left.length;
 
@@ -68,16 +83,6 @@ function triangulate(faces, vertices, angles) {
   }
   Array.prototype.push.apply(vertices, right)
 }
-
-var faces = [];
-var vertices = [];
-
-var angles = [];
-for (var i = 0; i < anglesCount - 2; i++) {
-  angles.push(makeAngle((i - anglesCount / 2)*10));
-}
-angles.push(angles[0]);
-
 
 triangulate(faces, vertices, angles);
 
