@@ -16,21 +16,24 @@ document.body.appendChild( renderer.domElement );
 var anglesCount = 100;
 var sphereSize = anglesCount;
 var cameraDist = 100;
-var spikiness = 0;
+var spikiness = 0.3;
 
 function makeAngle(offset) {
   var angle = [];
   var radianHorizontal;
   var radianVertical;
+  var spike;
   for (var i = 0; i <= sphereSize; i++) {
     radianHorizontal = 2 * Math.PI * offset / anglesCount;
     radianVertical = Math.PI * i / sphereSize - Math.PI / 2;
 
+    spike = sphereSize * spikiness * (0.5 - Math.random());
+
     angle.push(
       new THREE.Vector3(
-        sphereSize * Math.cos(radianHorizontal) * Math.cos(radianVertical),
-        sphereSize * Math.sin(radianHorizontal) * Math.cos(radianVertical),
-        sphereSize * Math.sin(radianVertical),
+        (sphereSize + spike) * Math.cos(radianHorizontal) * Math.cos(radianVertical),
+        (sphereSize + spike) * Math.sin(radianHorizontal) * Math.cos(radianVertical),
+        (sphereSize + spike) * Math.sin(radianVertical),
       )
     )
   }
