@@ -13,9 +13,9 @@ var renderer = new THREE.WebGLRenderer();
 renderer.setSize( window.innerWidth, window.innerHeight );
 document.body.appendChild( renderer.domElement );
 
-var anglesCount = 100;
+var anglesCount = 30;
 var sphereSize = anglesCount;
-var cameraDist = 100;
+var cameraDist = 500;
 var spikiness = 0.3;
 
 function makeAngle(offset) {
@@ -23,17 +23,18 @@ function makeAngle(offset) {
   var radianHorizontal;
   var radianVertical;
   var spike;
+  var spike2 = sphereSize * spikiness * (0.5 - Math.random()) / 2;
   for (var i = 0; i <= sphereSize; i++) {
-    radianHorizontal = 2 * Math.PI * offset / anglesCount;
-    radianVertical = Math.PI * i / sphereSize - Math.PI / 2;
+    radianHorizontal = 2 * Math.PI * (offset + Math.random()) / anglesCount;
+    radianVertical = Math.PI * (i + Math.random()) / sphereSize - Math.PI / 2;
 
-    spike = sphereSize * spikiness * (0.5 - Math.random());
+    spike = sphereSize * spikiness * (0.5 - Math.random()) / 2;
 
     angle.push(
       new THREE.Vector3(
-        (sphereSize + spike) * Math.cos(radianHorizontal) * Math.cos(radianVertical),
-        (sphereSize + spike) * Math.sin(radianHorizontal) * Math.cos(radianVertical),
-        (sphereSize + spike) * Math.sin(radianVertical),
+        (sphereSize + spike + spike2) * Math.cos(radianHorizontal) * Math.cos(radianVertical) * 0.75,
+        (sphereSize + spike + spike2) * Math.sin(radianHorizontal) * Math.cos(radianVertical) * 0.75,
+        (sphereSize + spike + spike2) * Math.sin(radianVertical),
       )
     )
   }
@@ -94,9 +95,10 @@ geometry.vertices = vertices;
 geometry.faces = faces;
 geometry.computeFaceNormals();
 
-var mesh = new THREE.Mesh( geometry, new THREE.MeshNormalMaterial({
+var mesh = new THREE.Mesh( geometry, new THREE.MeshBasicMaterial({
+  color: "olive",
   side: THREE.DoubleSide,
-  opacity: 0.1,
+  opacity: 1,
   transparent: true
 }));
 scene.add( mesh );
@@ -104,6 +106,7 @@ scene.add( mesh );
 var wireframe = new THREE.WireframeGeometry( geometry );
 
 var line = new THREE.LineSegments( wireframe );
+line.material.color = new THREE.Color("green");
 line.material.depthTest = true;
 line.material.opacity = 0.5;
 line.material.transparent = true;
@@ -114,6 +117,11 @@ camera.position.z = cameraDist;
 
 function animate() {
   requestAnimationFrame( animate );
+  mesh.rotation.y += 0.01;
+  mesh.rotation.x += 0.01;
+
+  line.rotation.y += 0.01;
+  line.rotation.x += 0.01;
   controls.update();
   renderer.render( scene, camera );
 }
